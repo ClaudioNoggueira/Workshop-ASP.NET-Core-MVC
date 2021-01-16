@@ -17,6 +17,7 @@ namespace SalesWebMVC.Services {
             return context.Seller.ToList();
         }
         public void Insert(Seller obj) {
+            obj.Department = context.Department.First();
             context.Add(obj);
             context.SaveChanges();
         }
