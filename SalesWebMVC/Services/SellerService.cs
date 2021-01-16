@@ -5,6 +5,7 @@ using SalesWebMVC.Services.Exceptions;
 using SalesWebMVC.Data;
 using SalesWebMVC.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace SalesWebMVC.Services {
     public class SellerService {
@@ -14,31 +15,31 @@ namespace SalesWebMVC.Services {
             this.context = context;
         }
 
-        public List<Seller> FindAll() {
-            return context.Seller.ToList();
+        public async Task<List<Seller>> FindAllAsync() {
+            return await context.Seller.ToListAsync();
         }
-        public void Insert(Seller obj) {
+        public async Task InsertAsync(Seller obj) {
             context.Add(obj);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        public Seller FindById(int id) {
-            return context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id == id);
+        public async Task<Seller> FindByIdAsync(int id) {
+            return await context.Seller.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
         }
 
-        public void Remove(int id) {
-            var obj = context.Seller.Find(id);
+        public async Task RemoveAsync(int id) {
+            var obj = await context.Seller.FindAsync(id);
             context.Seller.Remove(obj);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
 
-        public void Update(Seller obj) {
-            if (!context.Seller.Any(x => x.Id == obj.Id)) {
+        public async Task UpdateAsync(Seller obj) {
+            if (! await context.Seller.AnyAsync(x => x.Id == obj.Id)) {
                 throw new NotFoundException("Id not found");
             }
             try {
                 context.Update(obj);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException e) {
                 throw new DbConcurrencyException(e.Message);
