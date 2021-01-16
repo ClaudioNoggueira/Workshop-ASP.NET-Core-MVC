@@ -28,13 +28,18 @@ namespace SalesWebMVC.Services {
         }
 
         public async Task RemoveAsync(int id) {
-            var obj = await context.Seller.FindAsync(id);
-            context.Seller.Remove(obj);
-            await context.SaveChangesAsync();
+            try {
+                var obj = await context.Seller.FindAsync(id);
+                context.Seller.Remove(obj);
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateException e) {
+                throw new IntegrityException("Cannot delete seller because he/she has sales. Otherwise, there would be sales without sellers.");
+            }
         }
 
         public async Task UpdateAsync(Seller obj) {
-            if (! await context.Seller.AnyAsync(x => x.Id == obj.Id)) {
+            if (!await context.Seller.AnyAsync(x => x.Id == obj.Id)) {
                 throw new NotFoundException("Id not found");
             }
             try {
